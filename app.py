@@ -12,15 +12,15 @@ st.write("CSVファイルの勤務データをExcelの業務報告書に自動�
 # File Uploaders
 st.header("1. ファイルのアップロード")
 
-uploaded_csv = st.file_uploader("CSVファイル (勤務データ)", type="csv")
-uploaded_excel = st.file_uploader("Excelファイル (業務報告書)", type="xlsx")
+uploaded_csv = st.file_uploader("【必須】CSVファイル (勤務データ)", type="csv")
+uploaded_excel = st.file_uploader("【必須】Excelファイル (業務報告書)", type="xlsx")
 
 st.header("2. 氏名の入力")
 col1, col2 = st.columns(2)
 with col1:
-    surname = st.text_input("苗字", placeholder="例: 山田")
+    surname = st.text_input("【必須】苗字", placeholder="例: 山田")
 with col2:
-    given_name = st.text_input("名前", placeholder="例: 太郎")
+    given_name = st.text_input("【必須】名前", placeholder="例: 太郎")
 
 # Combine for full name
 full_name = f"{surname} {given_name}" if surname and given_name else ""
