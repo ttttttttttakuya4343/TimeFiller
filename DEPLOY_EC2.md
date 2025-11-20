@@ -26,7 +26,7 @@ description: AWS EC2へのデプロイ手順
     *   **セキュリティグループ**:
         *   カスタム TCP ポート **8501** を `0.0.0.0/0` (任意の場所) から許可。
         *   **HTTPS** (ポート **443**) を `0.0.0.0/0` から許可 (HTTPS化する場合)。
-        *   *アプリ側でパスワード認証を行うため、IP制限は必須ではありません。*
+        *   *社内利用の場合は、接続元IPを制限することを推奨します。*
 7.  **ストレージ**: 8GB gp3 (デフォルトでOK)。
 8.  **インスタンスを起動** をクリックします。
 
@@ -151,7 +151,6 @@ ssh -i path/to/kintai-key.pem ubuntu@<パブリックIPアドレス>
 git clone <リポジトリURL> TimeFiller
 cd TimeFiller
 docker build -t timefiller .
-# アプリ側でパスワード認証を行わないため、セキュリティグループで接続元IPを制限することを強く推奨します。
 # --restart unless-stopped を追加して、再起動時も自動で立ち上がるようにします
 docker run -d -p 8501:8501 --restart unless-stopped --name timefiller-container timefiller
 ```
@@ -171,9 +170,8 @@ scp -i path/to/kintai-key.pem -r path/to/kintai/* ubuntu@<パブリックIPア�
 ```bash
 cd TimeFiller
 docker build -t timefiller .
-# -e APP_PASSWORD=... でパスワードを設定します
 # --restart unless-stopped を追加して、再起動時も自動で立ち上がるようにします
-docker run -d -p 8501:8501 -e APP_PASSWORD=your_secure_password --restart unless-stopped --name timefiller-container timefiller
+docker run -d -p 8501:8501 --restart unless-stopped --name timefiller-container timefiller
 ```
 
 ## 手順 5: アプリケーションへのアクセス
@@ -205,8 +203,6 @@ services:
     restart: unless-stopped
     ports:
       - "8501:8501"
-    environment:
-      - APP_PASSWORD=${APP_PASSWORD}
 
   nginx:
     image: nginx:1.25-alpine
@@ -267,7 +263,7 @@ server {
 3.  **スクリプトの実行**:
     ```bash
     chmod +x init-letsencrypt.sh
-    sudo APP_PASSWORD=your_password ./init-letsencrypt.sh
+    sudo ./init-letsencrypt.sh
     ```
 
 成功すると、Nginx とアプリが起動します。ブラウザで `https://your-domain.com` にアクセスして確認してください。
