@@ -151,9 +151,9 @@ ssh -i path/to/kintai-key.pem ubuntu@<パブリックIPアドレス>
 git clone <リポジトリURL> TimeFiller
 cd TimeFiller
 docker build -t timefiller .
-# -e APP_PASSWORD=... でパスワードを設定します
+# アプリ側でパスワード認証を行わないため、セキュリティグループで接続元IPを制限することを強く推奨します。
 # --restart unless-stopped を追加して、再起動時も自動で立ち上がるようにします
-docker run -d -p 8501:8501 -e APP_PASSWORD=your_secure_password --restart unless-stopped --name timefiller-container timefiller
+docker run -d -p 8501:8501 --restart unless-stopped --name timefiller-container timefiller
 ```
 
 ### 方法 B: ファイルのアップロード (SCP)
@@ -310,3 +310,24 @@ crontab -e
 2.  インスタンスを選択 > **インスタンスの状態** > **インスタンスを停止**。
 3.  使う時に **インスタンスを開始** します。
     *   *注意: Elastic IP を使っていない場合、再起動時にパブリック IP アドレスが変わります。*
+
+## 手順 7: アプリケーションの更新
+
+コードを変更して GitHub にプッシュした後、EC2 上で反映させる手順です。
+
+```bash
+cd TimeFiller
+
+# 1. 最新コードの取得
+git pull
+
+# 2. イメージの再ビルド
+docker build -t timefiller:latest .
+
+# 3. コンテナの再作成（新しいイメージで起動）
+docker-compose up -d
+
+# (オプション) 古いイメージの削除
+docker image prune -f
+```
+※ `nginx.conf` を変更した場合は、さらに `docker-compose restart nginx` も実行してください。

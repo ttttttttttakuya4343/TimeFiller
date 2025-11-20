@@ -34,11 +34,7 @@ kintai/
 # 依存ライブラリのインストール
 pip install -r requirements.txt
 
-# アプリの起動 (パスワードなし)
-streamlit run app.py
-
-# アプリの起動 (パスワードあり)
-export APP_PASSWORD=your_password
+# アプリの起動
 streamlit run app.py
 ```
 
@@ -69,5 +65,5 @@ python3 attendance_auto_input.py [CSVファイル] [Excelファイル] [-o 出�
 
 ## 更新履歴
 
-- **v2.0.0**: Webアプリ化 (Streamlit)、AWSデプロイ対応、パスワード認証追加
+- **v2.0.0**: Webアプリ化 (Streamlit)、AWSデプロイ対応
 - **v1.0.0**: 初回リリース (コマンドライン版)

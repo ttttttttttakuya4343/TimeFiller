@@ -4,43 +4,7 @@ from attendance_auto_input import AttendanceAutoInput
 import io
 import os
 
-def check_password():
-    """Returns `True` if the user had the correct password."""
-
-    password = os.environ.get("APP_PASSWORD")
-    if not password:
-        # No password set, allow access
-        return True
-
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == password:
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # don't store password
-        else:
-            st.session_state["password_correct"] = False
-
-    if "password_correct" not in st.session_state:
-        # First run, show input
-        st.text_input(
-            "パスワードを入力してください", type="password", on_change=password_entered, key="password"
-        )
-        return False
-    elif not st.session_state["password_correct"]:
-        # Password incorrect, show input + error
-        st.text_input(
-            "パスワードを入力してください", type="password", on_change=password_entered, key="password"
-        )
-        st.error("パスワードが違います")
-        return False
-    else:
-        # Password correct
-        return True
-
 st.set_page_config(page_title="TimeFiller", layout="centered")
-
-if not check_password():
-    st.stop()
 
 st.title("TimeFiller")
 st.write("CSVファイルの勤務データをExcelの業務報告書に自動入力します。")
@@ -124,8 +88,8 @@ with st.expander("使い方"):
 
 with st.expander("ジョブカンからのCSV取得方法"):
     st.markdown("""
-    1. ジョブカン勤怠管理にログインします。
-    2. 左側メニューの「出勤簿」をクリックします。
-    3.「指定月」で取得したい月を選択します。
-    4. ダウンロードボタン付近にフォーマットを選択するラジオボタンがあるので「CSV」を選択し、ダウンロードします。
+    1. **ジョブカン勤怠管理**にログインします。
+    2. 左側メニューの**「出勤簿」**をクリックします。
+    3. **「指定月」**で取得したい月を選択します。
+    4. ダウンロードボタン付近のラジオボタンで**「CSV」**を選択し、ダウンロードします。
     """)
