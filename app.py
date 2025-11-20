@@ -66,7 +66,10 @@ if uploaded_csv and uploaded_excel:
     
     st.header("3. 処理の実行")
     if st.button("自動入力を実行", type="primary"):
-        with st.spinner("処理中..."):
+        if not surname or not given_name:
+            st.error("苗字と名前を入力してください。")
+        else:
+            with st.spinner("処理中..."):
             try:
                 # Create tool instance with file objects
                 # Note: Streamlit file objects work directly with pandas and openpyxl
