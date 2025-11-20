@@ -66,49 +66,47 @@ if uploaded_csv and uploaded_excel:
     
     st.header("3. 処理の実行")
     if st.button("自動入力を実行", type="primary"):
-        if not surname or not given_name:
-            st.error("苗字と名前を入力してください。")
         else:
             with st.spinner("処理中..."):
-            try:
-                # Create tool instance with file objects
-                # Note: Streamlit file objects work directly with pandas and openpyxl
-                tool = AttendanceAutoInput(uploaded_csv, uploaded_excel, surname, full_name)
-                
-                # Run process
-                # Since we didn't provide an output path, it returns a BytesIO stream
-                result_stream = tool.process()
-                
-                if result_stream:
-                    st.success("処理が完了しました！")
+                try:
+                    # Create tool instance with file objects
+                    # Note: Streamlit file objects work directly with pandas and openpyxl
+                    tool = AttendanceAutoInput(uploaded_csv, uploaded_excel, surname, full_name)
                     
-                    # Generate filename for download
-                    original_filename = uploaded_excel.name
-                    if surname:
-                        # Replace '〇〇' with surname if present, otherwise just prepend/append?
-                        # User request: "〇〇の部分には、勤務表作成者の苗字が入ります"
-                        if '〇〇' in original_filename:
-                            output_filename = original_filename.replace('〇〇', surname)
+                    # Run process
+                    # Since we didn't provide an output path, it returns a BytesIO stream
+                    result_stream = tool.process()
+                    
+                    if result_stream:
+                        st.success("処理が完了しました！")
+                        
+                        # Generate filename for download
+                        original_filename = uploaded_excel.name
+                        if surname:
+                            # Replace '〇〇' with surname if present, otherwise just prepend/append?
+                            # User request: "〇〇の部分には、勤務表作成者の苗字が入ります"
+                            if '〇〇' in original_filename:
+                                output_filename = original_filename.replace('〇〇', surname)
+                            else:
+                                # If 〇〇 is not found, maybe just insert it or keep original?
+                                # Let's try to be smart but safe.
+                                output_filename = original_filename.replace('.xlsx', f'_{surname}.xlsx')
                         else:
-                            # If 〇〇 is not found, maybe just insert it or keep original?
-                            # Let's try to be smart but safe.
-                            output_filename = original_filename.replace('.xlsx', f'_{surname}.xlsx')
+                            filename_base = original_filename.rsplit('.', 1)[0]
+                            output_filename = f"{filename_base}_processed.xlsx"
+                        
+                        st.header("4. ダウンロード")
+                        st.download_button(
+                            label="作成されたExcelファイルをダウンロード",
+                            data=result_stream,
+                            file_name=output_filename,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
                     else:
-                        filename_base = original_filename.rsplit('.', 1)[0]
-                        output_filename = f"{filename_base}_processed.xlsx"
-                    
-                    st.header("4. ダウンロード")
-                    st.download_button(
-                        label="作成されたExcelファイルをダウンロード",
-                        data=result_stream,
-                        file_name=output_filename,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-                else:
-                    st.error("処理に失敗しました。ログを確認してください。")
-            except Exception as e:
-                st.error(f"エラーが発生しました: {e}")
-                st.exception(e)
+                        st.error("処理に失敗しました。ログを確認してください。")
+                except Exception as e:
+                    st.error(f"エラーが発生しました: {e}")
+                    st.exception(e)
 
 else:
     st.info("CSVファイルとExcelファイルの両方をアップロードしてください。")
