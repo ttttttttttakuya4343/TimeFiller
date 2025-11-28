@@ -133,12 +133,14 @@ class AttendanceAutoInput:
                 self.worksheet.cell(row=excel_row, column=4, value=None)  # 出勤
                 self.worksheet.cell(row=excel_row, column=5, value=None)  # 退勤
                 self.worksheet.cell(row=excel_row, column=6, value=None)  # 休憩
-                self.worksheet.cell(row=excel_row, column=7, value=timedelta(0))  # 稼働時間
+                self.worksheet.cell(row=excel_row, column=6, value=None)  # 休憩
+                # G列（稼働時間）は数式のため更新しない
+                # H列（備考）も更新しない
                 
-                if attendance_status == '有休':
-                    self.worksheet.cell(row=excel_row, column=8, value='有休')
-                else:
-                    self.worksheet.cell(row=excel_row, column=8, value='')
+                # if attendance_status == '有休':
+                #     self.worksheet.cell(row=excel_row, column=8, value='有休')
+                # else:
+                #     self.worksheet.cell(row=excel_row, column=8, value='')
                     
             elif start_time and end_time:
                 # 通常勤務の場合
@@ -150,11 +152,10 @@ class AttendanceAutoInput:
                 self.worksheet.cell(row=excel_row, column=5, value=end_time)
                 # F列: 休憩時間
                 self.worksheet.cell(row=excel_row, column=6, value=break_time)
-                # G列: 稼働時間
-                self.worksheet.cell(row=excel_row, column=7, value=work_hours)
-                # H列: 作業内容
-                # 基本は空欄（ユーザー要望）
-                self.worksheet.cell(row=excel_row, column=8, value='')
+                # F列: 休憩時間
+                self.worksheet.cell(row=excel_row, column=6, value=break_time)
+                # G列（稼働時間）は数式のため更新しない
+                # H列（作業内容）も更新しない
                 
                 total_work_time += work_hours
                 work_days += 1
@@ -163,14 +164,14 @@ class AttendanceAutoInput:
                 self.worksheet.cell(row=excel_row, column=4, value=None)
                 self.worksheet.cell(row=excel_row, column=5, value=None)
                 self.worksheet.cell(row=excel_row, column=6, value=None)
-                self.worksheet.cell(row=excel_row, column=7, value=timedelta(0))
-                self.worksheet.cell(row=excel_row, column=8, value='')
+                self.worksheet.cell(row=excel_row, column=5, value=None)
+                self.worksheet.cell(row=excel_row, column=6, value=None)
+                # G列、H列は更新しない
         
         # サマリー情報の更新
-        # 出勤日数（9行目、C列）
-        self.worksheet.cell(row=9, column=3, value=work_days)
-        # 稼働時間（10行目、C列）
-        self.worksheet.cell(row=10, column=3, value=total_work_time)
+        # 出勤日数と稼働時間はExcelの数式（SUBTOTAL等）に任せるため更新しない
+        # self.worksheet.cell(row=9, column=3, value=work_days)
+        # self.worksheet.cell(row=10, column=3, value=total_work_time)
         
         # 氏名の入力（C7）
         if self.full_name:
